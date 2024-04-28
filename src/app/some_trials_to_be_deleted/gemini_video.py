@@ -16,62 +16,47 @@ def create_replace_directory(dir_path: str) -> None:
         os.makedirs(dir_path)
 
 
-def extract_frame_from_video(
-    video_file_path: str, output_dir_path: str, output_file_prefix: str = "frame_"
-) -> None:
-    """Extracts frames from a video file at one frame per second."""
-    print(f"Extracting frames from {video_file_path} at 1 frame per second...")
-
+def extract_frame_from_video(video_file_uri: str, output_dir_path: str) -> None:
+    """Extracts one frame per second from a video file and saves it as a JPEG image."""
     create_replace_directory(output_dir_path)
 
-    # Open the video file
-    vidcap = cv2.VideoCapture(video_file_path)
-    if not vidcap.isOpened():
-        raise FileNotFoundError(f"Error: Could not open video file {video_file_path}.")
+    video_capture = cv2.VideoCapture(video_file_uri)
+
+    fps = int(video_capture.get(cv2.CAP_PROP_FPS))  # Number of frames per second
+    frame_counter = 0
+    nb_frames_extracted = 0
+    output_file_prefix = os.path.basename(video_file_uri).replace(".", "_")
+    output_file_prefix += "_frame_"
 
     try:
-        fps = int(vidcap.get(cv2.CAP_PROP_FPS))  # Number of frames per second
-        fame_counter = 0
-        while True:
+        while video_capture.isOpened():
             # Read the next frame
-            success, frame = vidcap.read()
+            success, frame = video_capture.read()
             if not success:  # End of video
                 break
 
             # If the frame counter is a multiple of the frame rate, save the frame
-            # If not, skip the frame but still increment the frame counter
+            # Otherwise, skip the frame but still increment the frame counter
             # This will extract one frame per second
-            if fame_counter % fps == 0:
+            if frame_counter % fps == 0:
                 time_string = (
-                    f"{fame_counter // fps // 60:02d}:{fame_counter // fps % 60:02d}"
+                    f"{frame_counter // fps // 60:02d}-{frame_counter // fps % 60:02d}"
                 )
                 output_file_name = f"{output_file_prefix}{time_string}.jpg"
                 output_file_path = os.path.join(output_dir_path, output_file_name)
                 cv2.imwrite(output_file_path, frame)
                 print(f"Extracted: {output_file_path}")
+                nb_frames_extracted += 1
 
-            fame_counter += 1
-            print(
-                f"Completed video frame extraction. Extracted {fame_counter // fps} frames."
-            )
+            frame_counter += 1
+        print(
+            f"Completed video frame extraction. Extracted {nb_frames_extracted} frames."
+        )
     finally:  # Ensure that the video capture object is always released
-        vidcap.release()
+        video_capture.release()
 
 
 if __name__ == "__main__":
-    # TODO: change docstring
-    """This script demonstrates how to use the Google GenAI API to generate content using the Gemini model."""
+    video_file_uri = "https://storage.googleapis.com/generativeai-downloads/data/SherlockJr._10min.mp4"
 
-    video_file_name = "https://storage.googleapis.com/generativeai-downloads/data/SherlockJr._10min.mp4"
-
-    extract_frame_from_video(video_file_name, "frames")
-
-    # Traverse up two directories
-    # env_path = pathlib.Path(__file__).parents[2] / ".env"
-    # load_dotenv(dotenv_path=env_path)
-
-    # genai.configure(api_key=os.environ["GOOGLE_API_KEY"])
-
-    # model = genai.GenerativeModel("models/gemini-1.5-pro-latest")
-    # response = model.generate_content("Please give me python code to sort a list.")
-    # print(response.text)
+    extract_frame_from_video(video_file_uri, "frames")

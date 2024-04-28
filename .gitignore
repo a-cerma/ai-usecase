@@ -4,3 +4,6 @@ __pycache__/
 # Environments
 .env
 venv/
+
+# Frames of the video to analyze with the model
+frames/
