@@ -1,62 +1,112 @@
 import os
 import pathlib
-import shutil
+from typing import List, Optional
 
-import cv2
 import google.generativeai as genai
 from dotenv import load_dotenv
 
-
-def create_replace_directory(dir_path: str) -> None:
-    """Creates a directory if it does not exist. If it exists, it is deleted and recreated."""
-    if not os.path.exists(dir_path):
-        os.makedirs(dir_path)
-    else:
-        shutil.rmtree(dir_path)
-        os.makedirs(dir_path)
+FRAME_PREFIX = "_frame_"
+FRAME_EXTRACTION_DIRECTORY = "frames"
 
 
-def extract_frame_from_video(video_file_uri: str, output_dir_path: str) -> None:
-    """Extracts one frame per second from a video file and saves it as a JPEG image."""
-    create_replace_directory(output_dir_path)
+class Frame:
+    """Represents a frame file with associated metadata and operations."""
 
-    video_capture = cv2.VideoCapture(video_file_uri)
+    def __init__(self, file_path: str):
+        self.file_path: str = file_path
+        self.timestamp: str = self._extract_timestamp(file_path)
+        self.display_name = None  # TODO: Check if this is needed
+        self.response = None  # TODO: Find the type
 
-    fps = int(video_capture.get(cv2.CAP_PROP_FPS))  # Number of frames per second
-    frame_counter = 0
-    nb_frames_extracted = 0
-    output_file_prefix = os.path.basename(video_file_uri).replace(".", "_")
-    output_file_prefix += "_frame_"
+    def _extract_timestamp(self, filename: str) -> str:
+        """Extracts the timestamp from the filename, assuming the format '***_frame_MM-SS.jpg'."""
+        parts = filename.split(FRAME_PREFIX)
+        if len(parts) != 2:
+            raise ValueError(f"Filename format is incorrect: {filename}")
+        # NB: A dash was needed in the filename because colons are not allowed in filenames
+        timestamp_with_dash = parts[1].split(".")[0]
+        timestamp_with_colon = timestamp_with_dash.replace("-", ":")
+        return timestamp_with_colon
 
-    try:
-        while video_capture.isOpened():
-            # Read the next frame
-            success, frame = video_capture.read()
-            if not success:  # End of video
-                break
+    def upload(self):
+        """Uploads the frame file and stores the response."""
+        print(f"Uploading {self.file_path}")
+        self.response = genai.upload_file(path=self.file_path)
 
-            # If the frame counter is a multiple of the frame rate, save the frame
-            # Otherwise, skip the frame but still increment the frame counter
-            # This will extract one frame per second
-            if frame_counter % fps == 0:
-                time_string = (
-                    f"{frame_counter // fps // 60:02d}-{frame_counter // fps % 60:02d}"
-                )
-                output_file_name = f"{output_file_prefix}{time_string}.jpg"
-                output_file_path = os.path.join(output_dir_path, output_file_name)
-                cv2.imwrite(output_file_path, frame)
-                print(f"Extracted: {output_file_path}")
-                nb_frames_extracted += 1
 
-            frame_counter += 1
-        print(
-            f"Completed video frame extraction. Extracted {nb_frames_extracted} frames."
-        )
-    finally:  # Ensure that the video capture object is always released
-        video_capture.release()
+def list_frame_files(directory: str) -> List[Frame]:
+    """Lists sorted frame files in the specified directory."""
+    files = sorted(os.listdir(directory))
+    return [Frame(os.path.join(directory, file)) for file in files]
+
+
+def upload_frames(
+    frames: List[Frame], nb_frames_to_upload: Optional[int] = None
+) -> List[Frame]:
+    """Uploads a specified number of frames or all frames if no limit is specified."""
+    uploaded_files = []
+    # TODO: Change with a slice instead of taking the first n frames
+    if nb_frames_to_upload is not None and nb_frames_to_upload < len(frames):
+        frames = frames[:nb_frames_to_upload]
+    print(f"Uploading {len(frames)} files...")
+    for frame in frames:
+        frame.upload()
+        uploaded_files.append(frame)
+    print(f"Upload completed!\n")
+    return uploaded_files
+
+
+def list_uploaded_files(uploaded_files: List[Frame]):
+    """Prints URIs of all uploaded frames."""
+    print("List of all uploaded files:")
+    for file in uploaded_files:
+        print(file.response.uri)
+    print()  # Newline
+
+
+def generate_content(files: List[Frame], prompt: str, model_name: str) -> str:
+    """Generates content based on uploaded frames using a specified model."""
+    model = genai.GenerativeModel(model_name=model_name)
+    request = [prompt]
+    for file in files:
+        request.append(file.timestamp)
+        request.append(file.response)
+
+    response = model.generate_content(request, request_options={"timeout": 600})
+    return response.text
+
+
+def delete_uploaded_files(files: List[Frame]):
+    """Deletes uploaded frames from the server."""
+    print(f"Deleting {len(files)} files...")
+    for file in files:
+        genai.delete_file(file.response.name)
+        print(f"Deleted {file.file_path} at URI {file.response.uri}")
+    print(f"Deletion completed!")
+
+
+def main():
+    # Load environment and configure API
+    env_path = pathlib.Path(__file__).parents[2] / ".env"
+    load_dotenv(dotenv_path=env_path)
+    genai.configure(api_key=os.environ["GOOGLE_API_KEY"])
+
+    # Upload frames using the File API
+    frames = list_frame_files(FRAME_EXTRACTION_DIRECTORY)
+    nb_frames_to_upload = 2  # Modify as needed
+    uploaded_files = upload_frames(frames, nb_frames_to_upload)
+
+    list_uploaded_files(uploaded_files)
+
+    # Generate content with the GenAI model
+    prompt = "Describe this video."
+    model_name = "models/gemini-1.5-pro-latest"
+    response = generate_content(uploaded_files, prompt, model_name)
+    print(f"GenAI Answer:\n{response}\n")
+
+    # Cleanup
+    delete_uploaded_files(uploaded_files)
 
 
 if __name__ == "__main__":
-    video_file_uri = "https://storage.googleapis.com/generativeai-downloads/data/SherlockJr._10min.mp4"
-
-    extract_frame_from_video(video_file_uri, "frames")
+    main()
