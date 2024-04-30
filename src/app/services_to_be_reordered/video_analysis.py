@@ -41,13 +41,18 @@ def list_frame_files(directory: str) -> List[Frame]:
 
 
 def upload_frames(
-    frames: List[Frame], nb_frames_to_upload: Optional[int] = None
+    frames: List[Frame], frame_range: Optional[tuple] = None
 ) -> List[Frame]:
-    """Uploads a specified number of frames or all frames if no limit is specified."""
+    """Uploads frames specified by a range tuple (start, end) or all frames if no range is specified."""
     uploaded_files = []
-    # TODO: Change with a slice instead of taking the first n frames
-    if nb_frames_to_upload is not None and nb_frames_to_upload < len(frames):
-        frames = frames[:nb_frames_to_upload]
+
+    if frame_range is not None:
+        start, end = frame_range
+        # Correct the range if out of bounds
+        start = max(0, start)
+        end = min(len(frames), end)
+        frames = frames[start:end]
+
     print(f"Uploading {len(frames)} files...")
     for frame in frames:
         frame.upload()
@@ -99,9 +104,13 @@ def main():
 
     # Upload frames using the File API
     frames = list_frame_files(FRAME_EXTRACTION_DIRECTORY)
-    nb_frames_to_upload = None  # Modify as needed
-    uploaded_files = upload_frames(frames, nb_frames_to_upload)
+    frame_range = (-5, 20)  # Modify as needed
+    # Uploads frames from index min to max-1
+    # TODO: For now if some uploads fail we don't have a proper way to handle it and to clean up
+    uploaded_files = upload_frames(frames, frame_range)
 
+    # TODO: Can be deleted for speed
+    # It was there to visually confirm the uploaded files
     list_uploaded_files(uploaded_files)
 
     # Generate content with the GenAI model
@@ -129,6 +138,7 @@ JSON format with 'exerciseName', 'review', and 'score' fields. Scores range from
     print(f"GenAI Answer:\n{response}\n")
 
     # Cleanup
+    # TODO: Should be done asynchronously
     delete_uploaded_files(uploaded_files)
 
 
