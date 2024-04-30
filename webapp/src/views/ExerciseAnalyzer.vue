@@ -57,9 +57,12 @@ const uploadFile=async()=>{
   formData.append('file', file.value);
   try{
     isLoading.value = true
-    console.log('is loading',  isLoading.value)
+    console.log('is loading',formData,  isLoading.value)
     const response = await launchExerciseAnalyzer(formData)
-    exerciseAnalysis.value = await response[0]?.review
+    console.log(response)
+    exerciseAnalysis.value = JSON.parse(response)[0].review
+    console.log('Exersise Analysis', JSON.parse(response)[0], response[0],response[0]["review"],exerciseAnalysis.value)
+    isLoading.value = false
 
   }
   catch(error){
