@@ -25,7 +25,7 @@
 
         <v-row>
             <v-card color="#181818" style="border: 1px solid #008000;" width="800">
-                Text
+                {{ exerciseAnalysis }}
             </v-card>
         </v-row>
     </main>
@@ -39,6 +39,7 @@ import {launchExerciseAnalyzer} from '../api/launchExerciseAnalyzer'
 
 const file = ref([]) 
 const isLoading = ref(false)
+const exerciseAnalysis = ref()
 
 function handleFileUpload(event) {
   const files = event.target.files;
@@ -47,7 +48,7 @@ function handleFileUpload(event) {
   }
 }
 
-async function uploadFile() {
+const uploadFile=async()=>{
   if (!file.value) return;
 
 
@@ -56,8 +57,9 @@ async function uploadFile() {
   formData.append('file', file.value);
   try{
     isLoading.value = true
-    console.log('is loading', isLoading.value)
-    await launchExerciseAnalyzer(formData)
+    console.log('is loading',  isLoading.value)
+    const response = await launchExerciseAnalyzer(formData)
+    exerciseAnalysis.value = await response[0]?.review
 
   }
   catch(error){

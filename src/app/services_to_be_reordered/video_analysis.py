@@ -96,7 +96,7 @@ def delete_uploaded_files(files: List[Frame]):
     print(f"Deletion completed!")
 
 
-def main():
+def analyze_video():
     # Load environment and configure API
     env_path = pathlib.Path(__file__).parents[2] / ".env"
     load_dotenv(dotenv_path=env_path)
@@ -140,7 +140,8 @@ JSON format with 'exerciseName', 'review', and 'score' fields. Scores range from
     # Cleanup
     # TODO: Should be done asynchronously
     delete_uploaded_files(uploaded_files)
+    return response
 
 
 if __name__ == "__main__":
-    main()
+    analyze_video()

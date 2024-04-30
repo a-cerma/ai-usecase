@@ -10,7 +10,7 @@ export const launchExerciseAnalyzer = async(encodedVideo)=>{
       })
     .then(response => {
         console.log('Data submitted successfully:', response.data);
-        return response
+        return response.data
     })
     .catch(error => {
       console.error('Error submitting data:', error);
