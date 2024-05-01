@@ -1,8 +1,7 @@
 <template>
   <MenuItem>
     <template #icon>
-      <div class="header" @click="logDescription()">
-        <!-- <DocumentationIcon /> -->
+      <div class="header">
         <v-icon
           icon="mdi-weight-lifter"
           size="large"
@@ -74,9 +73,6 @@
   import MenuItem from './MenuItem.vue'
   import { RouterLink } from 'vue-router'
 
-  const logDescription = () => {
-      console.log('This is click')
-    }
 </script>
 <style scoped>
     .header{
