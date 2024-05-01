@@ -1,11 +1,16 @@
 <script setup>
 import { RouterLink, RouterView } from 'vue-router'
 import ApplicationHeader from './components/ApplicationHeader.vue'
+import { useFavicon } from '@vueuse/core'
+
+const icon = useFavicon()
+//Change Favicon
+icon.value = '../src/assets/logo.png'
 </script>
 
 <template>
   <header>
-    <img alt="Vue logo" class="logo" src="@/assets/logo.png" width="125" height="125" />
+    <img class="logo" src="@/assets/logo.png" width="125" height="125" />
 
     <div class="wrapper">
       <ApplicationHeader msg="SmartLift" />
