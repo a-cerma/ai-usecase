@@ -1,7 +1,5 @@
 <template>
     <main>
-        <br/>
-        <br/>
         <v-row>
             <v-responsive>
                 <video ref="videoPlayer" width="auto" height="350" v-if="video" controls>
@@ -13,75 +11,40 @@
         <br/>
         <br/>
         <v-row>
-            <v-file-input
-                v-model="video"
-                width="1000"
-                accept="video/mp4"
-                label="File input"
-                placeholder="Select your files"
-                prepend-icon="mdi-file-video"
-                variant="outlined"
-                @change="handleFileUpload"
-                counter
-                
-            >
-        </v-file-input>
-        <v-btn 
-        :loading="isLoading"
-        height="55" @click="uploadFile">Large Button</v-btn>
+            <v-col>
+                <v-file-input
+                    v-model="video"
+                    width="1000"
+                    accept="video/mp4"
+                    label="File input"
+                    placeholder="Select your files"
+                    prepend-icon="mdi-file-video"
+                    variant="outlined"
+                    @change="handleFileUpload"
+                    counter
+                    
+                >
+                </v-file-input>
+            </v-col>
+            <v-col>
+              <v-btn cols="auto" size="x-large" prepend-icon="mdi-play"  class="text-none mb-4"  color="#007BFF" :loading="isLoading" @click="uploadFile">Start Analysis</v-btn>
+            </v-col>
     
         </v-row>
-
-        <v-row>
-            <v-card color="#282828" style="border: 1px solid #007BFF;" width="auto">
-                Color Palette for SmartLift
-
-                ### 1. **Main Color for Logo and Highlighted Content**
-
-                - **Electric Blue (#007BFF)**: dynamic and energetic feel that is perfect for a fitness app. Conveys trust, reliability, and a sense of cutting-edge technology.
-
-                ### 2. **Background Color**
-
-                - **Deep Gray (#282828) OR (#121212, darker)**: sleek and modern look, offering a softer alternative to pure black.
-
-                ### 3. **Body Text Color**
-
-                - **Soft White (#F5F5F5)**: excellent readability against the dark gray background. Less harsh than pure white.
-
-                ### 4. **Accent Colors**
-
-                - **Teal (#17A2B8)**: for secondary buttons and links, providing a harmonious match with the electric blue.
-
-                OR
-
-                - **Electric Orange (#FFA500)**: for calls to action and can energize the design, encouraging user interaction.
-
-                - **Platinum (#E5E4E2)** or **Silver (#C0C0C0)**: for less prominent but necessary elements like secondary text or icons.
-                Color Palette for SmartLift
-
-                ### 1. **Main Color for Logo and Highlighted Content**
-
-                - **Electric Blue (#007BFF)**: dynamic and energetic feel that is perfect for a fitness app. Conveys trust, reliability, and a sense of cutting-edge technology.
-
-                ### 2. **Background Color**
-
-                - **Deep Gray (#282828) OR (#121212, darker)**: sleek and modern look, offering a softer alternative to pure black.
-
-                ### 3. **Body Text Color**
-
-                - **Soft White (#F5F5F5)**: excellent readability against the dark gray background. Less harsh than pure white.
-
-                ### 4. **Accent Colors**
-
-                - **Teal (#17A2B8)**: for secondary buttons and links, providing a harmonious match with the electric blue.
-
-                OR
-
-                - **Electric Orange (#FFA500)**: for calls to action and can energize the design, encouraging user interaction.
-
-                - **Platinum (#E5E4E2)** or **Silver (#C0C0C0)**: for less prominent but necessary elements like secondary text or icons.
-            </v-card>
+        <br/>
+        <br/>
+        <v-row  v-if="exerciseAnalysisResult" >
+              <div class="title"> Exercise Detected: </div> {{ exerciseAnalysisResult.exerciseName }}
         </v-row>
+        <v-row v-if="exerciseAnalysisResult" >
+            <div class="title">Rating: </div> <div :style="{color:getScoreColor(exerciseAnalysisResult.score), fontWeight: 'bold'}"> {{ exerciseAnalysisResult.score }}/10</div>
+        </v-row>
+        <br>
+        <br>
+        <v-row   v-if="exerciseAnalysisResult">
+            {{ exerciseAnalysisResult.review }} 
+        </v-row>
+        
     </main>
 
   </template>
@@ -94,7 +57,7 @@ import {launchExerciseAnalyzer} from '../api/launchExerciseAnalyzer'
 const video = ref() 
 
 const isLoading = ref(false)
-const exerciseAnalysis = ref()
+const exerciseAnalysisResult = ref()
 
 const videoPlayer = ref(null);
 
@@ -126,9 +89,7 @@ const uploadFile=async()=>{
   try{
     isLoading.value = true
     const response = await launchExerciseAnalyzer(formData)
-    console.log(response)
-    exerciseAnalysis.value = JSON.parse(response)[0].review
-    console.log('Exersise Analysis', JSON.parse(response)[0], response[0],response[0]["review"],exerciseAnalysis.value)
+    exerciseAnalysisResult.value = JSON.parse(response)[0]
     isLoading.value = false
 
   }
@@ -141,7 +102,17 @@ const uploadFile=async()=>{
 
 }
 
-
+const getScoreColor = (score)=>{
+    if(score > 0 && score <= 4){
+         return '#FF0000'
+    }
+    else if(score > 4 && score <7){
+         return '#FFA500'
+    }
+    else if(score>=6 && score<=10){
+         return '#008000'
+    }
+}
 </script>
 
 <style scoped>
@@ -149,4 +120,12 @@ const uploadFile=async()=>{
     height: 200px!important;
     width: 300px!important;
    }
+   .title {
+    /* font-size: 1.2rem; */
+    /* font-weight: 500; */
+    /* margin-bottom: 0.4rem; */
+    font-weight: bold;
+    color: var(--color-heading);
+    padding-right: 7px;
+    }
 </style>
