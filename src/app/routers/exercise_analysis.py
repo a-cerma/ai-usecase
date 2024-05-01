@@ -11,7 +11,6 @@ async def analyze_exercise_video(file: UploadFile = File(...)):
     try:
         video_bytes = await file.read()
         extract_frames_from_video(video_bytes, "frames")
-        # contents = await file.read()
         # Save file or process it here. For now, just return the file size.
         return analyze_video()
     except Exception as e:
