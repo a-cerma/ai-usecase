@@ -2,6 +2,14 @@
     <main>
         <br/>
         <br/>
+        <v-row>
+            <v-responsive>
+                <video width="200" height="250" controls>
+                    <source src="../assets/kickback.mp4"   style="max-width: 100%;" class="video" type="video/mp4" >
+                    Your browser does not support the video tag.
+                </video>
+            </v-responsive>
+        </v-row>
 
         <v-row>
             <v-file-input
@@ -77,6 +85,9 @@ const uploadFile=async()=>{
 
 </script>
 
-<style lang="scss" scoped>
-
+<style scoped>
+   .video{
+    height: 200px!important;
+    width: 300px!important;
+   }
 </style>
