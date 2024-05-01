@@ -10,7 +10,7 @@ icon.value = '../src/assets/logo.png'
 
 <template>
   <header>
-    <img class="logo" src="@/assets/logo.png" width="125" height="125" />
+    <img class="logo" src="@/assets/logo.png" width="250" height="250" />
 
     <div class="wrapper">
       <ApplicationHeader msg="SmartLift" />
