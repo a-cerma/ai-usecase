@@ -1,6 +1,7 @@
 import os
 import shutil
-
+import numpy as np
+import tempfile
 import cv2
 
 
@@ -10,22 +11,27 @@ def create_or_replace_directory(dir_path: str) -> None:
         shutil.rmtree(dir_path)
     os.makedirs(dir_path)
 
-
-def extract_frames_from_video(video_file_path: str, output_dir_path: str) -> None:
-    """Extracts one frame per second from a video file and saves it as a JPEG image in the output directory."""
+def extract_frames_from_video(video_bytes: bytes, output_dir_path: str) -> None:
+    """Extracts one frame per second from video bytes and saves it as a JPEG image in the output directory."""
     create_or_replace_directory(output_dir_path)
 
-    video_capture = cv2.VideoCapture(video_file_path)
-    if not video_capture.isOpened():
-        raise FileNotFoundError(f"Could not open video file: {video_file_path}")
-
-    fps = round(video_capture.get(cv2.CAP_PROP_FPS))  # Number of frames per second
-    frame_counter = 0
-    nb_frames_extracted = 0
-    output_file_prefix = os.path.basename(video_file_path).replace(".", "_")
-    output_file_prefix += "_frame_"
-
+    # Create a temporary file to store video bytes
+    temp_video_file_path = None  # Declare outside the with statement to extend its scope
     try:
+        with tempfile.NamedTemporaryFile(delete=False, suffix='.mp4') as temp_video_file:
+            temp_video_file.write(video_bytes)
+            temp_video_file.flush()  # Ensure all data is written to disk
+            temp_video_file_path = temp_video_file.name
+
+        video_capture = cv2.VideoCapture(temp_video_file_path)
+        if not video_capture.isOpened():
+            raise FileNotFoundError("Could not open video data")
+
+        fps = round(video_capture.get(cv2.CAP_PROP_FPS))  # Number of frames per second
+        frame_counter = 0
+        nb_frames_extracted = 0
+        output_file_prefix = "extracted_frame_"
+
         while True:
             # Read the next frame
             success, frame = video_capture.read()
@@ -46,9 +52,11 @@ def extract_frames_from_video(video_file_path: str, output_dir_path: str) -> Non
         print(
             f"Completed video frame extraction. Extracted {nb_frames_extracted} frames."
         )
-    finally:  # Ensure that the video capture object is always released
-        video_capture.release()
-
+    finally:  # Ensure that the video capture object and temporary file are always released
+        if video_capture:
+            video_capture.release()
+        if temp_video_file_path:
+            os.unlink(temp_video_file_path)  # Delete the temporary file
 
 if __name__ == "__main__":
     video_file_path = "videos/kickback.mp4"
