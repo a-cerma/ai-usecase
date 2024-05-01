@@ -10,9 +10,9 @@
       </div>
     </template>
     <template #heading>
-      <RouterLink to="/exercise-analyzer" class="header">
-        <strong>Exercise Analyzer </strong>
-      </RouterLink>
+        <RouterLink to="/exercise-analyzer" :style="{fontWeight: 'bold'}">
+          Exercise Analyzer 
+        </RouterLink>
     </template>
     Perfect your form with SmartLift’s Exercise Analyzer. Upload a video of your workout and receive detailed feedback on your execution to maximize effectiveness and minimize injury.
   </MenuItem>
