@@ -1,7 +1,7 @@
 import axios from "axios";
 
 export const launchExerciseAnalyzer = async (encodedVideo) => {
-  const apiUrl = 'http://127.0.0.1:8000/exercise-analysis';
+  const apiUrl = import.meta.env.VITE_BACKEND_URL + '/exercise-analysis';
 
   return axios.post(apiUrl, encodedVideo, {
     headers: {

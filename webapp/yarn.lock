@@ -211,6 +211,11 @@
   dependencies:
     "undici-types" "~5.26.4"
 
+"@types/web-bluetooth@^0.0.20":
+  "integrity" "sha512-g9gZnnXVq7gM7v3tJCWV/qw7w+KeOlSHAhgF9RytFyifW6AF61hdT2ucrYhPq9hLs5JIryeupHV3qGk95dH9ow=="
+  "resolved" "https://registry.npmjs.org/@types/web-bluetooth/-/web-bluetooth-0.0.20.tgz"
+  "version" "0.0.20"
+
 "@ungap/structured-clone@^1.2.0":
   "integrity" "sha512-zuVdFrMJiuCDQUMCzQaD6KL28MjnqqN8XnAqiEq9PNm/hCPTSGfrXCOfwj1ow4LFb/tNymJPwsNbVePc1xFqrQ=="
   "resolved" "https://registry.npmjs.org/@ungap/structured-clone/-/structured-clone-1.2.0.tgz"
@@ -364,6 +369,28 @@
   dependencies:
     "js-beautify" "^1.14.9"
     "vue-component-type-helpers" "^2.0.0"
+
+"@vueuse/core@^10.9.0":
+  "integrity" "sha512-/1vjTol8SXnx6xewDEKfS0Ra//ncg4Hb0DaZiwKf7drgfMsKFExQ+FnnENcN6efPen+1kIzhLQoGSy0eDUVOMg=="
+  "resolved" "https://registry.npmjs.org/@vueuse/core/-/core-10.9.0.tgz"
+  "version" "10.9.0"
+  dependencies:
+    "@types/web-bluetooth" "^0.0.20"
+    "@vueuse/metadata" "10.9.0"
+    "@vueuse/shared" "10.9.0"
+    "vue-demi" ">=0.14.7"
+
+"@vueuse/metadata@10.9.0":
+  "integrity" "sha512-iddNbg3yZM0X7qFY2sAotomgdHK7YJ6sKUvQqbvwnf7TmaVPxS4EJydcNsVejNdS8iWCtDk+fYXr7E32nyTnGA=="
+  "resolved" "https://registry.npmjs.org/@vueuse/metadata/-/metadata-10.9.0.tgz"
+  "version" "10.9.0"
+
+"@vueuse/shared@10.9.0":
+  "integrity" "sha512-Uud2IWncmAfJvRaFYzv5OHDli+FbOzxiVEQdLCKQKLyhz94PIyFC3CHcH7EDMwIn8NPtD06+PNbC/PiO0LGLtw=="
+  "resolved" "https://registry.npmjs.org/@vueuse/shared/-/shared-10.9.0.tgz"
+  "version" "10.9.0"
+  dependencies:
+    "vue-demi" ">=0.14.7"
 
 "@webassemblyjs/ast@^1.12.1", "@webassemblyjs/ast@1.12.1":
   "integrity" "sha512-EKfMUOPRRUTy5UII4qJDGPpqfwjOmZ5jeGFwid9mnoqIFK+e0vqoi1qH56JpmZSzEL53jKnNzScdmftJyG5xWg=="
@@ -2325,6 +2352,11 @@
   "version" "2.0.14"
 
 "vue-demi@>=0.14.5":
+  "integrity" "sha512-EOG8KXDQNwkJILkx/gPcoL/7vH+hORoBaKgGe+6W7VFMvCYJfmF2dGbvgDroVnI8LU7/kTu8mbjRZGBU1z9NTA=="
+  "resolved" "https://registry.npmjs.org/vue-demi/-/vue-demi-0.14.7.tgz"
+  "version" "0.14.7"
+
+"vue-demi@>=0.14.7":
   "integrity" "sha512-EOG8KXDQNwkJILkx/gPcoL/7vH+hORoBaKgGe+6W7VFMvCYJfmF2dGbvgDroVnI8LU7/kTu8mbjRZGBU1z9NTA=="
   "resolved" "https://registry.npmjs.org/vue-demi/-/vue-demi-0.14.7.tgz"
   "version" "0.14.7"

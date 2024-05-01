@@ -104,7 +104,7 @@ def analyze_video():
 
     # Upload frames using the File API
     frames = list_frame_files(FRAME_EXTRACTION_DIRECTORY)
-    frame_range = (-5, 20)  # Modify as needed
+    frame_range = None  # Modify as needed
     # Uploads frames from index min to max-1
     # TODO: For now if some uploads fail we don't have a proper way to handle it and to clean up
     uploaded_files = upload_frames(frames, frame_range)
