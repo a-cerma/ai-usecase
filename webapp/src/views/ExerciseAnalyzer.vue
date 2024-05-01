@@ -20,6 +20,7 @@
                     placeholder="Select your files"
                     prepend-icon="mdi-file-video"
                     variant="outlined"
+                    :style="{cursor:'pointer'}"
                     @change="handleFileUpload"
                     counter
                     
@@ -27,7 +28,16 @@
                 </v-file-input>
             </v-col>
             <v-col>
-              <v-btn cols="auto" size="x-large" prepend-icon="mdi-play"  class="text-none mb-4"  color="#007BFF" :loading="isLoading" @click="uploadFile">Start Analysis</v-btn>
+              <v-btn 
+                  cols="auto" 
+                  size="x-large" 
+                  prepend-icon="mdi-play" 
+                  class="custom-btn"  
+                  color="#007BFF" 
+                  :ripple="false"
+                  :loading="isLoading"
+                  @click="uploadFile" 
+                >Start Analysis</v-btn>
             </v-col>
     
         </v-row>
@@ -128,4 +138,12 @@ const getScoreColor = (score)=>{
     color: var(--color-heading);
     padding-right: 7px;
     }
+    .custom-btn:hover {
+        /* Reset hover styles to default */
+        background-color: inherit !important;
+        color: inherit !important;
+        cursor: pointer;
+
+        }
+
 </style>
